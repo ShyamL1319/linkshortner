@@ -48,7 +48,7 @@ export function EditLinkDialog({ link }: EditLinkDialogProps) {
           setSuccess(false);
         }, 1000);
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred");
     } finally {
       setLoading(false);

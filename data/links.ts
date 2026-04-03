@@ -3,6 +3,23 @@ import { links, type Link, type NewLink } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
+async function findLinkById(linkId: number): Promise<Link | undefined> {
+  const [link] = await db.select().from(links).where(eq(links.id, linkId));
+  return link;
+}
+
+async function findOwnedLink(
+  linkId: number,
+  userId: string,
+): Promise<Link | null> {
+  const link = await findLinkById(linkId);
+  if (!link || link.userId !== userId) {
+    return null;
+  }
+
+  return link;
+}
+
 /**
  * Fetches all links for a specific user
  * @param userId - The authenticated user's ID
@@ -55,13 +72,8 @@ export async function updateLink(
   originalUrl: string,
   customSlug?: string,
 ): Promise<Link | null> {
-  // First verify ownership
-  const [existingLink] = await db
-    .select()
-    .from(links)
-    .where(eq(links.id, linkId));
-
-  if (!existingLink || existingLink.userId !== userId) {
+  const existingLink = await findOwnedLink(linkId, userId);
+  if (!existingLink) {
     return null;
   }
 
@@ -90,13 +102,8 @@ export async function deleteLink(
   linkId: number,
   userId: string,
 ): Promise<boolean> {
-  // First verify ownership
-  const [existingLink] = await db
-    .select()
-    .from(links)
-    .where(eq(links.id, linkId));
-
-  if (!existingLink || existingLink.userId !== userId) {
+  const existingLink = await findOwnedLink(linkId, userId);
+  if (!existingLink) {
     return false;
   }
 

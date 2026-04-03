@@ -46,7 +46,7 @@ export function CreateLinkDialog() {
           setSuccess(false);
         }, 1000);
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred");
     } finally {
       setLoading(false);
