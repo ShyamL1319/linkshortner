@@ -5,9 +5,41 @@ import { links, type Link, type NewLink } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
+type LinkRow = {
+  id: number;
+  userId: string;
+  originalUrl: string;
+  shortCode: string;
+  createdAt: Date;
+};
+
+const linkSelectFields = {
+  id: links.id,
+  userId: links.userId,
+  originalUrl: links.originalUrl,
+  shortCode: links.shortCode,
+  createdAt: links.createdAt,
+} as const;
+
+function hydrateLink(link: LinkRow, updatedAt = link.createdAt): Link {
+  return {
+    ...link,
+    updatedAt,
+  };
+}
+
 async function findLinkById(linkId: number): Promise<Link | undefined> {
-  const [link] = await db.select().from(links).where(eq(links.id, linkId));
-  return link;
+  try {
+    const [link] = await db.select().from(links).where(eq(links.id, linkId));
+    return link;
+  } catch (error) {
+    console.error("Falling back to a reduced link select:", error);
+    const [link] = await db
+      .select(linkSelectFields)
+      .from(links)
+      .where(eq(links.id, linkId));
+    return link ? hydrateLink(link) : undefined;
+  }
 }
 
 async function findOwnedLink(
@@ -28,11 +60,22 @@ async function findOwnedLink(
  * @returns Array of links belonging to the user, ordered by updatedAt (latest first)
  */
 export async function getUserLinks(userId: string): Promise<Link[]> {
-  return await db
-    .select()
-    .from(links)
-    .where(eq(links.userId, userId))
-    .orderBy(desc(links.updatedAt));
+  try {
+    return await db
+      .select()
+      .from(links)
+      .where(eq(links.userId, userId))
+      .orderBy(desc(links.updatedAt));
+  } catch (error) {
+    console.error("Falling back to createdAt for dashboard links:", error);
+    const userLinks = await db
+      .select(linkSelectFields)
+      .from(links)
+      .where(eq(links.userId, userId))
+      .orderBy(desc(links.createdAt));
+
+    return userLinks.map(hydrateLink);
+  }
 }
 
 /**
@@ -55,9 +98,18 @@ export async function createLink(
     shortCode,
   };
 
-  const [createdLink] = await db.insert(links).values(newLink).returning();
+  try {
+    const [createdLink] = await db.insert(links).values(newLink).returning();
+    return createdLink;
+  } catch (error) {
+    console.error("Falling back to a reduced insert return:", error);
+    const [createdLink] = await db
+      .insert(links)
+      .values(newLink)
+      .returning(linkSelectFields);
 
-  return createdLink;
+    return hydrateLink(createdLink);
+  }
 }
 
 /**
@@ -81,17 +133,31 @@ export async function updateLink(
 
   const shortCode = customSlug || existingLink.shortCode;
 
-  const [updatedLink] = await db
-    .update(links)
-    .set({
-      originalUrl,
-      shortCode,
-      updatedAt: new Date(),
-    })
-    .where(eq(links.id, linkId))
-    .returning();
+  try {
+    const [updatedLink] = await db
+      .update(links)
+      .set({
+        originalUrl,
+        shortCode,
+        updatedAt: new Date(),
+      })
+      .where(eq(links.id, linkId))
+      .returning();
 
-  return updatedLink;
+    return updatedLink;
+  } catch (error) {
+    console.error("Falling back to an update without updatedAt:", error);
+    const [updatedLink] = await db
+      .update(links)
+      .set({
+        originalUrl,
+        shortCode,
+      })
+      .where(eq(links.id, linkId))
+      .returning(linkSelectFields);
+
+    return hydrateLink(updatedLink, new Date());
+  }
 }
 
 /**

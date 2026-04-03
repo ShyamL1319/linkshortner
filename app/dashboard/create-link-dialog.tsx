@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createLink } from "./actions";
 import { Plus } from "lucide-react";
+import { ShortLinkActions } from "@/components/short-link-actions";
 
 export function CreateLinkDialog() {
   const [open, setOpen] = useState(false);
@@ -23,6 +24,7 @@ export function CreateLinkDialog() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [createdShortCode, setCreatedShortCode] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,14 +39,10 @@ export function CreateLinkDialog() {
         setError(result.error);
       } else if (result.success) {
         setSuccess(true);
+        setCreatedShortCode(result.shortCode ?? "");
         // Reset form
         setUrl("");
         setCustomSlug("");
-        // Close dialog after a brief delay to show success state
-        setTimeout(() => {
-          setOpen(false);
-          setSuccess(false);
-        }, 1000);
       }
     } catch {
       setError("An unexpected error occurred");
@@ -61,6 +59,7 @@ export function CreateLinkDialog() {
       setCustomSlug("");
       setError("");
       setSuccess(false);
+      setCreatedShortCode("");
     }
   };
 
@@ -72,7 +71,7 @@ export function CreateLinkDialog() {
           Create Link
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="sm:max-w-[560px] rounded-3xl border bg-background/95 shadow-2xl backdrop-blur">
         <DialogHeader>
           <DialogTitle>Create Shortened Link</DialogTitle>
           <DialogDescription>
@@ -114,13 +113,18 @@ export function CreateLinkDialog() {
               </p>
             </div>
             {error && (
-              <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded p-3">
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                 {error}
               </div>
             )}
             {success && (
-              <div className="text-sm text-green-600 bg-green-50 border border-green-200 rounded p-3">
-                Link created successfully!
+              <div className="grid gap-3 rounded-2xl border border-emerald-200/80 bg-emerald-50/80 p-4 text-emerald-950 shadow-sm">
+                <div className="text-sm font-medium">
+                  Link created successfully!
+                </div>
+                {createdShortCode && (
+                  <ShortLinkActions shortCode={createdShortCode} />
+                )}
               </div>
             )}
           </div>
@@ -131,11 +135,13 @@ export function CreateLinkDialog() {
               onClick={() => setOpen(false)}
               disabled={loading}
             >
-              Cancel
+              {success ? "Close" : "Cancel"}
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Creating..." : "Create Link"}
-            </Button>
+            {!success && (
+              <Button type="submit" disabled={loading}>
+                {loading ? "Creating..." : "Create Link"}
+              </Button>
+            )}
           </DialogFooter>
         </form>
       </DialogContent>

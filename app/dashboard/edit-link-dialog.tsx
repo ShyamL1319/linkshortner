@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { updateLink } from "./actions";
 import { Pencil } from "lucide-react";
 import type { Link } from "@/db/schema";
+import { ShortLinkActions } from "@/components/short-link-actions";
 
 interface EditLinkDialogProps {
   link: Pick<Link, "id" | "originalUrl" | "shortCode">;
@@ -28,6 +29,7 @@ export function EditLinkDialog({ link }: EditLinkDialogProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [updatedShortCode, setUpdatedShortCode] = useState(link.shortCode);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,11 +44,7 @@ export function EditLinkDialog({ link }: EditLinkDialogProps) {
         setError(result.error);
       } else if (result.success) {
         setSuccess(true);
-        // Close dialog after a brief delay to show success state to the user
-        setTimeout(() => {
-          setOpen(false);
-          setSuccess(false);
-        }, 1000);
+        setUpdatedShortCode(result.shortCode ?? (customSlug || link.shortCode));
       }
     } catch {
       setError("An unexpected error occurred");
@@ -63,6 +61,7 @@ export function EditLinkDialog({ link }: EditLinkDialogProps) {
       setCustomSlug(link.shortCode);
       setError("");
       setSuccess(false);
+      setUpdatedShortCode(link.shortCode);
     }
   };
 
@@ -73,7 +72,7 @@ export function EditLinkDialog({ link }: EditLinkDialogProps) {
           <Pencil className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="sm:max-w-[560px] rounded-3xl border bg-background/95 shadow-2xl backdrop-blur">
         <DialogHeader>
           <DialogTitle>Edit Link</DialogTitle>
           <DialogDescription>
@@ -112,13 +111,16 @@ export function EditLinkDialog({ link }: EditLinkDialogProps) {
               </p>
             </div>
             {error && (
-              <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded p-3">
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                 {error}
               </div>
             )}
             {success && (
-              <div className="text-sm text-green-600 bg-green-50 border border-green-200 rounded p-3">
-                Link updated successfully!
+              <div className="grid gap-3 rounded-2xl border border-emerald-200/80 bg-emerald-50/80 p-4 text-emerald-950 shadow-sm">
+                <div className="text-sm font-medium">
+                  Link updated successfully!
+                </div>
+                <ShortLinkActions shortCode={updatedShortCode} />
               </div>
             )}
           </div>
@@ -129,11 +131,13 @@ export function EditLinkDialog({ link }: EditLinkDialogProps) {
               onClick={() => setOpen(false)}
               disabled={loading}
             >
-              Cancel
+              {success ? "Close" : "Cancel"}
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Updating..." : "Update Link"}
-            </Button>
+            {!success && (
+              <Button type="submit" disabled={loading}>
+                {loading ? "Updating..." : "Update Link"}
+              </Button>
+            )}
           </DialogFooter>
         </form>
       </DialogContent>

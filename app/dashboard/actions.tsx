@@ -89,6 +89,7 @@ export interface UpdateLinkInput {
 export interface UpdateLinkResult {
   success?: boolean;
   error?: string;
+  shortCode?: string;
 }
 
 /**
@@ -117,7 +118,7 @@ export async function updateLink(
     }
 
     revalidatePath("/dashboard");
-    return { success: true };
+    return { success: true, shortCode: updatedLink.shortCode };
   } catch (error) {
     console.error("Error updating link:", error);
     return {
