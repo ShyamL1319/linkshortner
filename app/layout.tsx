@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { AuthControls } from "@/components/auth-controls";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,34 +15,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className="light h-full antialiased"
-    >
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+    <html lang="en" className="h-full antialiased">
+      <body className="min-h-screen" suppressHydrationWarning>
         <ClerkProvider
           signInFallbackRedirectUrl="/dashboard"
           signUpFallbackRedirectUrl="/dashboard"
           appearance={{
             elements: {
               button:
-                "px-4 py-2 text-sm font-medium text-black hover:opacity-80 transition-opacity",
+                "rounded-full px-4 py-2 text-sm font-medium text-foreground transition hover:bg-accent hover:text-accent-foreground",
               buttonPrimary:
-                "px-4 py-2 text-sm font-medium bg-black text-white rounded-lg hover:opacity-80 transition-opacity",
+                "rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90",
             },
           }}
         >
-          <header className="flex items-center justify-between w-full px-6 py-4 border-b bg-white">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-black">
-                Link Shortener
-              </h1>
-            </div>
-            <nav className="flex items-center gap-4">
-              <AuthControls />
-            </nav>
-          </header>
-          {children}
+          <div className="flex min-h-screen flex-col text-foreground">
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </div>
         </ClerkProvider>
       </body>
     </html>

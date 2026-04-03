@@ -1,0 +1,4 @@
+interface:
+  display_name: "Library Upgrade Flow"
+  short_description: "Audit and ship safe dependency upgrades"
+  default_prompt: "Use $library-upgrade-flow to audit, implement, and validate a dependency upgrade in this repo."

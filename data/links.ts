@@ -10,35 +10,77 @@ type LinkRow = {
   userId: string;
   originalUrl: string;
   shortCode: string;
-  createdAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
-const linkSelectFields = {
+type LinkBaseRow = Omit<LinkRow, "createdAt" | "updatedAt">;
+type LinkCreatedRow = LinkBaseRow & { createdAt: Date };
+
+const linkBaseSelectFields = {
   id: links.id,
   userId: links.userId,
   originalUrl: links.originalUrl,
   shortCode: links.shortCode,
+} as const;
+
+const linkSelectFields = {
+  ...linkBaseSelectFields,
   createdAt: links.createdAt,
 } as const;
 
-function hydrateLink(link: LinkRow, updatedAt?: Date): Link {
+const fullLinkSelectFields = {
+  ...linkSelectFields,
+  updatedAt: links.updatedAt,
+} as const;
+
+function hydrateLink(link: LinkRow): Link {
+  const createdAt = link.createdAt ?? link.updatedAt ?? new Date();
+  const updatedAt = link.updatedAt ?? link.createdAt ?? createdAt;
+
   return {
     ...link,
-    updatedAt: updatedAt ?? link.createdAt,
+    createdAt,
+    updatedAt,
   };
+}
+
+function hydrateCreatedLink(link: LinkCreatedRow): Link {
+  return hydrateLink({
+    ...link,
+    updatedAt: link.createdAt,
+  });
+}
+
+function hydrateBaseLink(link: LinkBaseRow): Link {
+  return hydrateLink(link);
 }
 
 async function findLinkById(linkId: number): Promise<Link | undefined> {
   try {
-    const [link] = await db.select().from(links).where(eq(links.id, linkId));
-    return link;
+    const [link] = await db
+      .select(fullLinkSelectFields)
+      .from(links)
+      .where(eq(links.id, linkId));
+    return link ? hydrateLink(link) : undefined;
   } catch (error) {
-    console.error("Falling back to a reduced link select:", error);
+    console.error("Falling back to a createdAt-based link select:", error);
+
     const [link] = await db
       .select(linkSelectFields)
       .from(links)
       .where(eq(links.id, linkId));
-    return link ? hydrateLink(link) : undefined;
+
+    if (link) {
+      return hydrateCreatedLink(link);
+    }
+
+    const [minimalLink] = await db
+      .select(linkBaseSelectFields)
+      .from(links)
+      .where(eq(links.id, linkId));
+
+    return minimalLink ? hydrateBaseLink(minimalLink) : undefined;
   }
 }
 
@@ -62,19 +104,35 @@ async function findOwnedLink(
 export async function getUserLinks(userId: string): Promise<Link[]> {
   try {
     return await db
-      .select()
+      .select(fullLinkSelectFields)
       .from(links)
       .where(eq(links.userId, userId))
       .orderBy(desc(links.updatedAt));
   } catch (error) {
     console.error("Falling back to createdAt for dashboard links:", error);
-    const userLinks = await db
-      .select(linkSelectFields)
-      .from(links)
-      .where(eq(links.userId, userId))
-      .orderBy(desc(links.createdAt));
 
-    return userLinks.map((link) => hydrateLink(link));
+    try {
+      const userLinks = await db
+        .select(linkSelectFields)
+        .from(links)
+        .where(eq(links.userId, userId))
+        .orderBy(desc(links.createdAt));
+
+      return userLinks.map((link) => hydrateCreatedLink(link));
+    } catch (createdAtError) {
+      console.error(
+        "Falling back to id ordering for dashboard links:",
+        createdAtError,
+      );
+
+      const userLinks = await db
+        .select(linkBaseSelectFields)
+        .from(links)
+        .where(eq(links.userId, userId))
+        .orderBy(desc(links.id));
+
+      return userLinks.map((link) => hydrateBaseLink(link));
+    }
   }
 }
 
@@ -100,15 +158,15 @@ export async function createLink(
 
   try {
     const [createdLink] = await db.insert(links).values(newLink).returning();
-    return createdLink;
+    return hydrateLink(createdLink);
   } catch (error) {
     console.error("Falling back to a reduced insert return:", error);
     const [createdLink] = await db
       .insert(links)
       .values(newLink)
-      .returning(linkSelectFields);
+      .returning(linkBaseSelectFields);
 
-    return hydrateLink(createdLink);
+    return hydrateBaseLink(createdLink);
   }
 }
 
@@ -144,7 +202,7 @@ export async function updateLink(
       .where(eq(links.id, linkId))
       .returning();
 
-    return updatedLink;
+    return hydrateLink(updatedLink);
   } catch (error) {
     console.error("Falling back to an update without updatedAt:", error);
     const [updatedLink] = await db
@@ -154,9 +212,9 @@ export async function updateLink(
         shortCode,
       })
       .where(eq(links.id, linkId))
-      .returning(linkSelectFields);
+      .returning(linkBaseSelectFields);
 
-    return hydrateLink(updatedLink, new Date());
+    return hydrateBaseLink(updatedLink);
   }
 }
 

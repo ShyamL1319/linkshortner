@@ -176,6 +176,13 @@ This is a link shortener application built with modern web technologies. The app
    - Document any non-standard behavior
    - Note dependencies or requirements
 
+### Library Upgrades
+
+- Use [`docs/library-upgrade-playbook.md`](/Users/shyamlal/Desktop/ai-coding/linkshortner/docs/library-upgrade-playbook.md) when upgrading dependencies or framework versions.
+- Follow `.github/instructions/library-upgrades.instructions.md` for upgrade reviews and implementations.
+- Use `.github/prompts/audit-library-upgrade.prompt.md` to inspect upgrade impact before editing.
+- Use `.github/prompts/implement-library-upgrade.prompt.md` when applying the upgrade.
+
 ## Quick Reference
 
 ### Common Commands
