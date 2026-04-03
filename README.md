@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Link Shortener
+
+![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=000000)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Clerk](https://img.shields.io/badge/Clerk-Auth-6C47FF?style=for-the-badge)
+![Neon](https://img.shields.io/badge/Neon-Postgres-00E599?style=for-the-badge)
+
+Live demo: https://linkshortner-two.vercel.app/
+
+Link Shortener is a modern, full-stack URL management platform built for speed, clarity, and branded sharing. It pairs a high-converting public landing page with a secure dashboard so users can shorten links, organize them, and share them with confidence.
+
+## Why It Stands Out
+
+- A polished, colorful landing experience that feels ready for a real product launch
+- Secure authentication with Clerk and protected user-specific dashboards
+- Fast short-link creation with optional custom slugs for branded campaigns
+- One-click copy and direct redirect handling for frictionless sharing
+- Server-side ownership checks so each user only manages their own links
+- Built with production-minded Next.js, Drizzle, and Neon patterns
+
+## Screenshots
+
+### Landing Page
+
+![Landing page screenshot](./public/readme/homepage.png)
+
+### Dashboard
+
+![Dashboard screenshot](./public/readme/dashboard.png)
+
+## Product Tour
+
+1. Open the public landing page and scan the feature-first hero.
+2. Sign up or sign in with Clerk.
+3. Create a short link from the dashboard.
+4. Use a custom slug when you want a memorable branded URL.
+5. Copy the generated link and share it anywhere.
+6. Visit `/l/[shortcode]` to redirect instantly to the destination URL.
+
+## Feature Highlights
+
+- **Landing page that sells the product.** The homepage uses bold typography, layered gradients, and clear calls to action to turn visitors into sign-ups.
+- **Dashboard built for speed.** Authenticated users can create, update, copy, and delete links from one tidy workspace.
+- **Custom slugs on demand.** Create memorable URLs for campaigns, clients, and social sharing.
+- **Instant sharing tools.** Every created link comes with a ready-to-copy short URL and a direct launch path.
+- **Reliable redirects.** The `/l/[shortcode]` route resolves the original destination on the server and sends users there immediately.
+- **Ownership-aware data model.** Links are stored per user and guarded by server-side checks before updates or deletes.
+
+## Tech Stack
+
+- Next.js 16 App Router
+- React 19
+- TypeScript
+- PostgreSQL with Neon serverless
+- Drizzle ORM
+- Clerk authentication
+- Tailwind CSS v4
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20+
+- npm
+- A PostgreSQL database
+- Clerk application keys
+
+### Environment Variables
+
+Create a `.env.local` file with:
+
+```bash
+DATABASE_URL="your-neon-postgres-connection-string"
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your-clerk-publishable-key"
+CLERK_SECRET_KEY="your-clerk-secret-key"
+```
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Run Locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` - start the development server
+- `npm run build` - build for production
+- `npm run start` - start the production server
+- `npm run lint` - run ESLint
+- `npm run test` - run the test suite
+- `npm run seed:links` - seed sample links
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+- `app/` - Next.js routes, layouts, and server actions
+- `components/` - shared UI components
+- `data/` - database access helpers
+- `docs/` - project standards and upgrade notes
+- `public/readme/` - marketing preview assets used in this README
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Notes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- The dashboard is only available to signed-in users.
+- Short links redirect through `/l/[shortcode]`.
+- Link ownership is enforced on the server.
