@@ -18,7 +18,7 @@ import { Pencil } from "lucide-react";
 import type { Link } from "@/db/schema";
 
 interface EditLinkDialogProps {
-  link: Link;
+  link: Pick<Link, "id" | "originalUrl" | "shortCode">;
 }
 
 export function EditLinkDialog({ link }: EditLinkDialogProps) {
@@ -103,7 +103,7 @@ export function EditLinkDialog({ link }: EditLinkDialogProps) {
                 value={customSlug}
                 onChange={(e) => setCustomSlug(e.target.value)}
                 disabled={loading}
-                pattern="[a-zA-Z0-9_-]*"
+                pattern="[a-zA-Z0-9_\\-]*"
                 minLength={3}
                 maxLength={20}
               />

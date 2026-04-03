@@ -1,23 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import {
-  ClerkProvider,
-  Show,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
+import { AuthControls } from "@/components/auth-controls";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Link Shortener - Create & Manage Short URLs",
@@ -32,7 +16,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} light h-full antialiased`}
+      className="light h-full antialiased"
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <ClerkProvider
@@ -54,15 +38,7 @@ export default function RootLayout({
               </h1>
             </div>
             <nav className="flex items-center gap-4">
-              <Show when="signed-out">
-                <SignInButton mode="modal">Sign In</SignInButton>
-              </Show>
-              <Show when="signed-out">
-                <SignUpButton mode="modal">Sign Up</SignUpButton>
-              </Show>
-              <Show when="signed-in">
-                <UserButton />
-              </Show>
+              <AuthControls />
             </nav>
           </header>
           {children}

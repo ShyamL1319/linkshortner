@@ -51,7 +51,13 @@ export default async function DashboardPage() {
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-2 ml-4">
-                    <EditLinkDialog link={link} />
+                    <EditLinkDialog
+                      link={{
+                        id: link.id,
+                        originalUrl: link.originalUrl,
+                        shortCode: link.shortCode,
+                      }}
+                    />
                     <DeleteLinkDialog
                       linkId={link.id}
                       shortCode={link.shortCode}

@@ -105,7 +105,7 @@ export function CreateLinkDialog() {
                 value={customSlug}
                 onChange={(e) => setCustomSlug(e.target.value)}
                 disabled={loading}
-                pattern="[a-zA-Z0-9_-]*"
+                pattern="[a-zA-Z0-9_\\-]*"
                 minLength={3}
                 maxLength={20}
               />

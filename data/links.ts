@@ -1,3 +1,5 @@
+import "server-only";
+
 import { db } from "@/db";
 import { links, type Link, type NewLink } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
