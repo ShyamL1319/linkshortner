@@ -20,10 +20,14 @@ const customSlugSchema = z
   .optional()
   .or(z.literal(""));
 
-const createLinkSchema = z.object({
-  url: z.string().url("Please enter a valid URL"),
+const urlSchema = z.string().url("Please enter a valid URL");
+
+const linkPayloadSchema = {
+  url: urlSchema,
   customSlug: customSlugSchema,
-});
+} as const;
+
+const createLinkSchema = z.object(linkPayloadSchema);
 
 export interface CreateLinkInput {
   url: string;
@@ -85,8 +89,7 @@ export async function createLink(
 
 const updateLinkSchema = z.object({
   linkId: z.number(),
-  url: z.string().url("Please enter a valid URL"),
-  customSlug: customSlugSchema,
+  ...linkPayloadSchema,
 });
 
 export interface UpdateLinkInput {
