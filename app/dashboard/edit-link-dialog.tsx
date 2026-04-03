@@ -42,7 +42,7 @@ export function EditLinkDialog({ link }: EditLinkDialogProps) {
         setError(result.error);
       } else if (result.success) {
         setSuccess(true);
-        // Close dialog after a brief delay to show success state
+        // Close dialog after a brief delay to show success state to the user
         setTimeout(() => {
           setOpen(false);
           setSuccess(false);
