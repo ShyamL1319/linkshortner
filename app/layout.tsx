@@ -32,18 +32,24 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} light h-full antialiased`}
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <ClerkProvider appearance={{
-          elements: {
-            button: "px-4 py-2 text-sm font-medium text-black dark:text-white hover:opacity-80 transition-opacity",
-            buttonPrimary: "px-4 py-2 text-sm font-medium bg-black dark:bg-white text-white dark:text-black rounded-lg hover:opacity-80 transition-opacity"
-          }
-        }}>
-          <header className="flex items-center justify-between w-full px-6 py-4 border-b bg-white dark:bg-black">
+        <ClerkProvider
+          signInFallbackRedirectUrl="/dashboard"
+          signUpFallbackRedirectUrl="/dashboard"
+          appearance={{
+            elements: {
+              button:
+                "px-4 py-2 text-sm font-medium text-black hover:opacity-80 transition-opacity",
+              buttonPrimary:
+                "px-4 py-2 text-sm font-medium bg-black text-white rounded-lg hover:opacity-80 transition-opacity",
+            },
+          }}
+        >
+          <header className="flex items-center justify-between w-full px-6 py-4 border-b bg-white">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-black dark:text-white">
+              <h1 className="text-2xl font-bold text-black">
                 Link Shortener
               </h1>
             </div>
