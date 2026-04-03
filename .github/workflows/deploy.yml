@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   security:
-    name: Security Checks
+    name: 1. Security Gate
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -26,12 +26,12 @@ jobs:
       WIZ_CLIENT_SECRET: ${{ secrets.WIZ_CLIENT_SECRET }}
 
     steps:
-      - name: Checkout repository
+      - name: Check out code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -43,7 +43,7 @@ jobs:
       - name: Run unit tests
         run: npm run test
 
-      - name: GitGuardian secret scan
+      - name: Run GitGuardian secret scan
         if: env.GITGUARDIAN_API_KEY != ''
         uses: GitGuardian/ggshield-action@v1
         env:
@@ -53,7 +53,7 @@ jobs:
         if: env.GITGUARDIAN_API_KEY == ''
         run: echo "GitGuardian scan skipped because GITGUARDIAN_API_KEY is not configured."
 
-      - name: Wiz IaC posture scan
+      - name: Run Wiz IaC posture scan
         if: env.WIZ_CLIENT_ID != '' && env.WIZ_CLIENT_SECRET != ''
         uses: aleksei-aikashev/wizcli-wrapper@v1
         with:
@@ -67,16 +67,16 @@ jobs:
         run: echo "Wiz scan skipped because WIZ_CLIENT_ID/WIZ_CLIENT_SECRET are not configured."
 
   validate:
-    name: Validate
+    name: 2. App Verification
     needs: security
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
     steps:
-      - name: Checkout repository
+      - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -85,14 +85,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
+      - name: Run lint
         run: npm run lint
 
-      - name: Build
+      - name: Build application
         run: npm run build
 
   preview:
-    name: Deploy Preview
+    name: 3. Preview Release
     needs: validate
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -107,10 +107,10 @@ jobs:
       VERCEL_TELEMETRY_DISABLED: 1
 
     steps:
-      - name: Checkout repository
+      - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -119,7 +119,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Pull Vercel project settings
+      - name: Pull preview environment settings
         run: npx vercel@latest pull --yes --environment=preview --token="$VERCEL_TOKEN"
 
       - name: Build preview artifact
@@ -129,18 +129,18 @@ jobs:
         run: npx vercel@latest deploy --prebuilt --token="$VERCEL_TOKEN"
 
   approve:
-    name: Wait for Approval
+    name: 4. Production Approval Gate
     needs: preview
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
-      name: production # 👈 approval gate — configure reviewers in repo Settings → Environments
+      name: production # Configure reviewers in repo Settings → Environments
     steps:
-      - name: Approval granted
+      - name: Confirm approval
         run: echo "Approved by reviewer — proceeding to production deploy"
 
   deploy:
-    name: Deploy to Production
+    name: 5. Production Release
     needs: approve
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -155,10 +155,10 @@ jobs:
       VERCEL_TELEMETRY_DISABLED: 1
 
     steps:
-      - name: Checkout repository
+      - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -167,7 +167,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Pull Vercel project settings
+      - name: Pull production environment settings
         run: npx vercel@latest pull --yes --environment=production --token="$VERCEL_TOKEN"
 
       - name: Build production artifact

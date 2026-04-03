@@ -82,6 +82,7 @@ Store secrets in GitHub Environments or repository secrets, never in the repo.
 
 ## 7. GitHub Actions Workflow Expectations
 
+- Use named phases that reflect the process: `Security Gate`, `App Verification`, `Preview Release`, `Production Approval Gate`, and `Production Release`.
 - Run unit tests before lint/build so breaking changes fail fast.
 - Run GitGuardian secret scanning in CI when the API key is configured.
 - Run Wiz posture scanning in CI when Wiz credentials are configured.
