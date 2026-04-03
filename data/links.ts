@@ -21,10 +21,10 @@ const linkSelectFields = {
   createdAt: links.createdAt,
 } as const;
 
-function hydrateLink(link: LinkRow, updatedAt = link.createdAt): Link {
+function hydrateLink(link: LinkRow, updatedAt?: Date): Link {
   return {
     ...link,
-    updatedAt,
+    updatedAt: updatedAt ?? link.createdAt,
   };
 }
 
@@ -74,7 +74,7 @@ export async function getUserLinks(userId: string): Promise<Link[]> {
       .where(eq(links.userId, userId))
       .orderBy(desc(links.createdAt));
 
-    return userLinks.map(hydrateLink);
+    return userLinks.map((link) => hydrateLink(link));
   }
 }
 
