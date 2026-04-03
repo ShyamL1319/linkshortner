@@ -8,12 +8,13 @@ import {
   updateLink as updateLinkHelper,
   deleteLink as deleteLinkHelper,
 } from "@/data/links";
+import { normalizeCustomSlug, parseActionError } from "./action-utils";
 
 const customSlugSchema = z
   .string()
   .regex(
     /^[a-zA-Z0-9_-]*$/,
-    "Only letters, numbers, hyphens, and underscores allowed"
+    "Only letters, numbers, hyphens, and underscores allowed",
   )
   .min(3, "Custom slug must be at least 3 characters")
   .max(20, "Custom slug must be at most 20 characters")
@@ -45,27 +46,11 @@ async function requireAuthUserId(): Promise<string | null> {
   return userId;
 }
 
-function normalizeCustomSlug(customSlug?: string): string | undefined {
-  return customSlug === "" ? undefined : customSlug;
-}
-
-function parseActionError(error: unknown, fallbackMessage: string): string {
-  if (error instanceof z.ZodError) {
-    return error.issues[0]?.message ?? fallbackMessage;
-  }
-
-  if (error instanceof Error && error.message.toLowerCase().includes("unique")) {
-    return "This custom slug is already taken";
-  }
-
-  return fallbackMessage;
-}
-
 /**
  * Server action to create a new shortened link
  */
 export async function createLink(
-  input: CreateLinkInput
+  input: CreateLinkInput,
 ): Promise<CreateLinkResult> {
   const userId = await requireAuthUserId();
   if (!userId) {
@@ -82,7 +67,10 @@ export async function createLink(
   } catch (error) {
     console.error("Error creating link:", error);
     return {
-      error: parseActionError(error, "Failed to create link. Please try again."),
+      error: parseActionError(
+        error,
+        "Failed to create link. Please try again.",
+      ),
     };
   }
 }
@@ -107,7 +95,7 @@ export interface UpdateLinkResult {
  * Server action to update an existing link
  */
 export async function updateLink(
-  input: UpdateLinkInput
+  input: UpdateLinkInput,
 ): Promise<UpdateLinkResult> {
   const userId = await requireAuthUserId();
   if (!userId) {
@@ -121,7 +109,7 @@ export async function updateLink(
       validated.linkId,
       userId,
       validated.url,
-      customSlug
+      customSlug,
     );
 
     if (!updatedLink) {
@@ -133,7 +121,10 @@ export async function updateLink(
   } catch (error) {
     console.error("Error updating link:", error);
     return {
-      error: parseActionError(error, "Failed to update link. Please try again."),
+      error: parseActionError(
+        error,
+        "Failed to update link. Please try again.",
+      ),
     };
   }
 }
@@ -155,7 +146,7 @@ export interface DeleteLinkResult {
  * Server action to delete a link
  */
 export async function deleteLink(
-  input: DeleteLinkInput
+  input: DeleteLinkInput,
 ): Promise<DeleteLinkResult> {
   const userId = await requireAuthUserId();
   if (!userId) {
@@ -176,7 +167,10 @@ export async function deleteLink(
   } catch (error) {
     console.error("Error deleting link:", error);
     return {
-      error: parseActionError(error, "Failed to delete link. Please try again."),
+      error: parseActionError(
+        error,
+        "Failed to delete link. Please try again.",
+      ),
     };
   }
 }

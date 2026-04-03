@@ -36,6 +36,12 @@ Store secrets in GitHub Environments or repository secrets, never in the repo.
 - `VERCEL_ORG_ID`
 - `VERCEL_PROJECT_ID`
 
+### Security tooling
+
+- `GITGUARDIAN_API_KEY`
+- `WIZ_CLIENT_ID`
+- `WIZ_CLIENT_SECRET`
+
 ## 3. Neon Database Rules
 
 - Use Neon for managed Postgres storage.
@@ -76,6 +82,9 @@ Store secrets in GitHub Environments or repository secrets, never in the repo.
 
 ## 7. GitHub Actions Workflow Expectations
 
+- Run unit tests before lint/build so breaking changes fail fast.
+- Run GitGuardian secret scanning in CI when the API key is configured.
+- Run Wiz posture scanning in CI when Wiz credentials are configured.
 - Run lint and build checks on every pull request.
 - Deploy production only after validation passes on `main`.
 - Cancel in-progress runs for the same branch when a newer commit lands.
@@ -87,10 +96,11 @@ Before merging or deploying:
 
 1. Verify env vars are configured in GitHub and Vercel.
 2. Verify schema changes are committed and reviewed.
-3. Run lint and build locally or in CI.
-4. Confirm auth-protected routes still redirect correctly.
-5. Confirm database queries succeed against Neon.
-6. Deploy to production only after the checks above pass.
+3. Run unit tests, lint, and build locally or in CI.
+4. Confirm secret scanning and Wiz posture scans are green or intentionally skipped with documented secrets.
+5. Confirm auth-protected routes still redirect correctly.
+6. Confirm database queries succeed against Neon.
+7. Deploy to production only after the checks above pass.
 
 ## 9. Operational Notes
 

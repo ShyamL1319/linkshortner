@@ -14,8 +14,61 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  security:
+    name: Security Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    env:
+      GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+      WIZ_CLIENT_ID: ${{ secrets.WIZ_CLIENT_ID }}
+      WIZ_CLIENT_SECRET: ${{ secrets.WIZ_CLIENT_SECRET }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: GitGuardian secret scan
+        if: env.GITGUARDIAN_API_KEY != ''
+        uses: GitGuardian/ggshield-action@v1
+        env:
+          GITGUARDIAN_API_KEY: ${{ env.GITGUARDIAN_API_KEY }}
+
+      - name: Skip GitGuardian scan
+        if: env.GITGUARDIAN_API_KEY == ''
+        run: echo "GitGuardian scan skipped because GITGUARDIAN_API_KEY is not configured."
+
+      - name: Wiz IaC posture scan
+        if: env.WIZ_CLIENT_ID != '' && env.WIZ_CLIENT_SECRET != ''
+        uses: aleksei-aikashev/wizcli-wrapper@v1
+        with:
+          wiz_client_id: ${{ env.WIZ_CLIENT_ID }}
+          wiz_client_secret: ${{ env.WIZ_CLIENT_SECRET }}
+          skip_docker_scan: skip
+          wiz_iac_policy: "Default IaC policy"
+
+      - name: Skip Wiz scan
+        if: env.WIZ_CLIENT_ID == '' || env.WIZ_CLIENT_SECRET == ''
+        run: echo "Wiz scan skipped because WIZ_CLIENT_ID/WIZ_CLIENT_SECRET are not configured."
+
   validate:
     name: Validate
+    needs: security
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -30,7 +83,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm ci
 
       - name: Lint
         run: npm run lint
@@ -64,7 +117,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm ci
 
       - name: Pull Vercel project settings
         run: npx vercel@latest pull --yes --environment=preview --token="$VERCEL_TOKEN"
@@ -81,7 +134,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
-      name: production   # 👈 approval gate — configure reviewers in repo Settings → Environments
+      name: production # 👈 approval gate — configure reviewers in repo Settings → Environments
     steps:
       - name: Approval granted
         run: echo "Approved by reviewer — proceeding to production deploy"
@@ -112,7 +165,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm ci
 
       - name: Pull Vercel project settings
         run: npx vercel@latest pull --yes --environment=production --token="$VERCEL_TOKEN"
