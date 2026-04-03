@@ -38,7 +38,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --legacy-peer-deps
 
       - name: Run unit tests
         run: npm run test
@@ -83,7 +83,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --legacy-peer-deps
 
       - name: Run lint
         run: npm run lint
@@ -117,7 +117,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --legacy-peer-deps
 
       - name: Pull preview environment settings
         run: npx vercel@latest pull --yes --environment=preview --token="$VERCEL_TOKEN"
@@ -165,7 +165,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --legacy-peer-deps
 
       - name: Pull production environment settings
         run: npx vercel@latest pull --yes --environment=production --token="$VERCEL_TOKEN"
