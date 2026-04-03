@@ -8,14 +8,16 @@ import { cn } from "@/lib/utils";
 
 interface ShortLinkActionsProps {
   shortCode: string;
+  shortUrl?: string;
   className?: string;
 }
 
 export function ShortLinkActions({
   shortCode,
+  shortUrl,
   className,
 }: ShortLinkActionsProps) {
-  const shortLink = getShortLink(shortCode);
+  const shortLink = shortUrl || getShortLink(shortCode);
   const [copied, setCopied] = useState(false);
   const [status, setStatus] = useState("");
   const resetTimerRef = useRef<number | null>(null);

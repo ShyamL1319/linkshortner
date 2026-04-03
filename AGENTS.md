@@ -183,6 +183,11 @@ This is a link shortener application built with modern web technologies. The app
 - Use `.github/prompts/audit-library-upgrade.prompt.md` to inspect upgrade impact before editing.
 - Use `.github/prompts/implement-library-upgrade.prompt.md` when applying the upgrade.
 
+### OpenAI Chat Assistant
+
+- Use [`.github/instructions/open-api.instructions.md`](/Users/shyamlal/Desktop/ai-coding/linkshortner/.github/instructions/open-api.instructions.md) when implementing the OpenAI-powered link creation assistant.
+- Use [`.github/agents/open-api.agent.md`](/Users/shyamlal/Desktop/ai-coding/linkshortner/.github/agents/open-api.agent.md) when planning or implementing the assistant in step-by-step phases.
+
 ## Quick Reference
 
 ### Common Commands
