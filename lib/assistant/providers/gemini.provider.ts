@@ -2,6 +2,8 @@ import {
   GoogleGenerativeAI,
   SchemaType,
   type ChatSession,
+  type GenerateContentResult,
+  type Content,
 } from "@google/generative-ai";
 import {
   ASSISTANT_INSTRUCTIONS,
@@ -25,7 +27,8 @@ export class GeminiProvider implements IAiProvider {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
 
-    return new GoogleGenerativeAI(apiKey).getGenerativeModel({
+    const genAI = new GoogleGenerativeAI(apiKey);
+    return genAI.getGenerativeModel({
       model: this.modelName,
       systemInstruction: ASSISTANT_INSTRUCTIONS,
       tools: [
@@ -56,7 +59,7 @@ export class GeminiProvider implements IAiProvider {
   }
 
   async chat(messages: ChatMessage[]): Promise<ChatReply> {
-    const history = messages.slice(0, -1).map((m) => ({
+    const history: Content[] = messages.slice(0, -1).map((m) => ({
       role: m.role === "assistant" ? "model" : "user",
       parts: [{ text: m.content }],
     }));
@@ -65,33 +68,29 @@ export class GeminiProvider implements IAiProvider {
     const model = this.getModel();
     this.chatSession = model.startChat({ history });
 
-    const result = await this.chatSession.sendMessage(lastMessage) as any;
-    const response = result.response.toJSON() as {
-      candidates: Array<{
-        content: {
-          parts: Array<{
-            text?: string;
-            functionCall?: { name: string; args: Record<string, string> };
-          }>;
-        };
-      }>;
-    };
+    const result: GenerateContentResult =
+      await this.chatSession.sendMessage(lastMessage);
+    const response = result.response;
 
-    for (const candidate of response.candidates ?? []) {
-      for (const part of candidate.content?.parts ?? []) {
-        if (part.functionCall) {
-          return {
-            type: "function_call",
-            call: {
-              name: part.functionCall.name,
-              args: part.functionCall.args,
-            },
-          };
-        }
-      }
+    // Check for function calls in the first candidate
+    const functionCall = response.candidates?.[0]?.content?.parts?.find(
+      (part) => !!part.functionCall,
+    )?.functionCall;
+
+    if (functionCall) {
+      return {
+        type: "function_call",
+        call: {
+          name: functionCall.name,
+          args: functionCall.args as Record<string, string>,
+        },
+      };
     }
 
-    return { type: "text", content: this.extractText(response) };
+    return {
+      type: "text",
+      content: response.text() || "I could not generate a response.",
+    };
   }
 
   async submitFunctionResult(
@@ -100,25 +99,17 @@ export class GeminiProvider implements IAiProvider {
   ): Promise<string> {
     if (!this.chatSession) throw new Error("No active chat session");
 
-    const secondResult = await this.chatSession.sendMessage([
-      { functionResponse: { name: functionName, response: result as object } },
-    ]) as any;
-
-    const response = secondResult.response.toJSON() as {
-      candidates: Array<{ content: { parts: Array<{ text?: string }> } }>;
+    // Use unknown first, then cast to object for the SDK requirement
+    const functionResponse = {
+      functionResponse: {
+        name: functionName,
+        response: (result as object) || {},
+      },
     };
 
-    return this.extractText(response);
-  }
+    const secondResult: GenerateContentResult =
+      await this.chatSession.sendMessage([functionResponse]);
 
-  private extractText(response: {
-    candidates: Array<{ content: { parts: Array<{ text?: string }> } }>;
-  }): string {
-    for (const candidate of response.candidates ?? []) {
-      for (const part of candidate.content?.parts ?? []) {
-        if (part.text?.trim()) return part.text.trim();
-      }
-    }
-    return "I could not generate a response.";
+    return secondResult.response.text() || "I could not generate a response.";
   }
 }
