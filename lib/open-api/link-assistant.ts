@@ -1,4 +1,4 @@
-export const DEFAULT_LINK_ASSISTANT_MODEL = "gpt-5.4-mini";
+export const DEFAULT_LINK_ASSISTANT_MODEL = "gpt-4o-mini";
 
 export const LINK_ASSISTANT_INSTRUCTIONS = [
   "You are the Link Assistant for Link Shortener.",
