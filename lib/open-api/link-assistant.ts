@@ -1,5 +1,5 @@
-export const DEFAULT_LINK_ASSISTANT_MODEL = "gpt-4o-mini";
-
+export const DEFAULT_LINK_ASSISTANT_MODEL_OPENAI = "gpt-4o-mini";
+export const DEFAULT_LINK_ASSISTANT_MODEL_GEMINI = "gemini-2.0-flash";
 export const LINK_ASSISTANT_INSTRUCTIONS = [
   "You are the Link Assistant for Link Shortener.",
   "Your only job is to help authenticated users create one short URL at a time.",

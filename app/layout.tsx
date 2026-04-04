@@ -4,6 +4,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { OpenApiChatWidget } from "@/components/open-api-chat-widget";
 import "./globals.css";
+import { Bot, Sparkles } from "lucide-react";
+import { ChatWidget } from "@/components/chat-widget";
 
 export const metadata: Metadata = {
   title: "Link Shortener - Create & Manage Short URLs",
@@ -34,7 +36,13 @@ export default function RootLayout({
             <SiteHeader />
             <main className="flex-1">{children}</main>
             <SiteFooter />
-            <OpenApiChatWidget />
+            {/* <OpenApiChatWidget /> */}
+            <ChatWidget
+              apiEndpoint="/api/gemini/chat"
+              title="Gemini Assistant"
+              description="Powered by Google Gemini."
+              icon={<Bot className="h-4 w-4" />}
+            />
           </div>
         </ClerkProvider>
       </body>
