@@ -59,13 +59,23 @@ export class GeminiProvider implements IAiProvider {
   }
 
   async chat(messages: ChatMessage[]): Promise<ChatReply> {
-    const history: Content[] = messages.slice(0, -1).map((m) => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content }],
+    const firstUserIndex = messages.findIndex(m => m.role === 'user');
+    
+    // 2. If no user message exists or it's the last message, start with empty history
+    // Otherwise, slice from the first user message up to the last one (exclusive)
+    const historyMessages = firstUserIndex !== -1 && firstUserIndex < messages.length - 1
+        ? messages.slice(firstUserIndex, -1)
+        : [];
+
+    const history = historyMessages.map((m) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }],
     }));
 
     const lastMessage = messages[messages.length - 1].content;
     const model = this.getModel();
+  
+  // Now history is guaranteed to either be empty or start with a 'user' role
     this.chatSession = model.startChat({ history });
 
     const result: GenerateContentResult =
