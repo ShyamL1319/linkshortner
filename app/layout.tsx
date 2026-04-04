@@ -22,14 +22,6 @@ export default function RootLayout({
         <ClerkProvider
           signInFallbackRedirectUrl="/dashboard"
           signUpFallbackRedirectUrl="/dashboard"
-          appearance={{
-            elements: {
-              button:
-                "rounded-full px-4 py-2 text-sm font-medium text-foreground transition hover:bg-accent hover:text-accent-foreground",
-              buttonPrimary:
-                "rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90",
-            },
-          }}
         >
           <div className="flex min-h-screen flex-col text-foreground">
             <SiteHeader />
