@@ -5,6 +5,7 @@ import { Check, Copy, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getShortLink } from "@/lib/short-link";
 import { cn } from "@/lib/utils";
+import { ShareModal } from "@/components/ShareModal";
 
 interface ShortLinkActionsProps {
   shortCode: string;
@@ -80,25 +81,27 @@ export function ShortLinkActions({
             <ExternalLink className="h-4 w-4 shrink-0" />
           </a>
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleCopy}
-          className="sm:shrink-0"
-        >
-            {copied ? (
+        <div className="flex items-center gap-2 sm:shrink-0">
+          <ShareModal url={shortLink} title={`Check out this link: ${shortLink}`} />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleCopy}
+          >
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4" />
+                  Copied
+                </>
+            ) : (
               <>
-                <Check className="h-4 w-4" />
-                Copied
+                <Copy className="h-4 w-4" />
+                Copy
               </>
-          ) : (
-            <>
-              <Copy className="h-4 w-4" />
-              Copy
-            </>
-          )}
-        </Button>
+            )}
+          </Button>
+        </div>
       </div>
       <p className="mt-2 text-xs text-muted-foreground" aria-live="polite">
         {status || "Share this URL with anyone you want to send to the link."}
