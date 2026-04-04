@@ -61,8 +61,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Assistant error:", error);
-    const message =
-      error instanceof Error ? error.message : "An unexpected error occurred.";
     return NextResponse.json({ error: 'Server Error' }, { status: 500 });
   }
 }

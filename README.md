@@ -19,15 +19,31 @@ Link Shortener is a modern, full-stack URL management platform built for speed, 
 - Server-side ownership checks so each user only manages their own links
 - Built with production-minded Next.js, Drizzle, and Neon patterns
 
-## Screenshots
+## Application Workflow
 
-### Landing Page
+The application follows a simple, intuitive workflow from arrival to sharing.
 
-![Landing page screenshot](./public/readme/homepage.png)
+> **Tip:** You can automatically regenerate these screenshots for your own documentation at any time using our built-in Playwright script: `npx playwright test tests/generate-screenshots.spec.ts`.
 
-### Dashboard
+### 1. Landing Page
+The journey begins on the public landing page, designed to convert visitors with clear calls-to-action and a feature-first hero section.
+![Landing Page](./public/readme/landing-page.png)
 
-![Dashboard screenshot](./public/readme/dashboard.png)
+### 2. Authentication
+A beautiful, secure, and seamless Sign-In and Sign-Up experience powered by Clerk to protect user links.
+![Sign In](./public/readme/sign-in.png)
+
+### 3. Dashboard
+After authenticating securely via Clerk, users are greeted by their personal Dashboard. Here they can view total links, access existing short links, and launch the creation flow.
+![Dashboard](./public/readme/dashboard.png)
+
+### 4. Create Short Link
+Clicking "Create Link" opens a streamlined modal where users paste their long URL and optionally specify a memorable custom slug for branding.
+![Create Link](./public/readme/create-link.png)
+
+### 5. Share Anywhere
+Once a link is created, the newly integrated "Share" feature allows users to instantly distribute their links via WhatsApp, X (Twitter), Facebook, Instagram, Email, or Native Mobile Share depending on their device.
+![Share Modal](./public/readme/share-modal.png)
 
 ## Product Tour
 
@@ -44,8 +60,16 @@ Link Shortener is a modern, full-stack URL management platform built for speed, 
 - **Dashboard built for speed.** Authenticated users can create, update, copy, and delete links from one tidy workspace.
 - **Custom slugs on demand.** Create memorable URLs for campaigns, clients, and social sharing.
 - **Instant sharing tools.** Every created link comes with a ready-to-copy short URL and a direct launch path.
+- **Share anywhere.** Generate native sharing intents for WhatsApp, X (Twitter), Facebook, Email, and clipboard fallbacks with Web Share API support for mobile.
 - **Reliable redirects.** The `/l/[shortcode]` route resolves the original destination on the server and sends users there immediately.
 - **Ownership-aware data model.** Links are stored per user and guarded by server-side checks before updates or deletes.
+
+## Testing & Security
+
+This project enforces high code quality and security standards through:
+- **Unit Testing:** Jest and React Testing Library are configured to test components and utility functions.
+- **Security Linting:** ESLint is enhanced with `eslint-plugin-security` to statically detect vulnerabilities during development.
+- **Continuous Integration (CI):** GitHub Action workflows automatically run linting, unit tests, and dependency security audits on every push to the `main` branch.
 
 ## Tech Stack
 
@@ -97,6 +121,7 @@ Open `http://localhost:3000`.
 - `npm run start` - start the production server
 - `npm run lint` - run ESLint
 - `npm run test` - run the test suite
+- `npx playwright test` - run end-to-end tests and generate screenshots
 - `npm run seed:links` - seed sample links
 
 ## Project Structure

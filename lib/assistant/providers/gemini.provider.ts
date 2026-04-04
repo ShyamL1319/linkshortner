@@ -3,7 +3,6 @@ import {
   SchemaType,
   type ChatSession,
   type GenerateContentResult,
-  type Content,
 } from "@google/generative-ai";
 import {
   ASSISTANT_INSTRUCTIONS,
