@@ -33,13 +33,13 @@ export function SiteHeader() {
             </div>
           </Link>
 
-          <div className="rounded-full border border-border/70 bg-card/75 px-3 py-2 shadow-sm backdrop-blur-sm lg:hidden">
+          <div className="flex items-center gap-3 lg:hidden">
             <AuthControls />
           </div>
         </div>
 
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-          <nav className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <nav className="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {navItems.map((item) => {
               const active = isActive(item.href);
 
@@ -61,7 +61,7 @@ export function SiteHeader() {
             })}
           </nav>
 
-          <div className="hidden items-center gap-3 rounded-full border border-border/70 bg-card/75 px-3 py-2 shadow-sm backdrop-blur-sm lg:flex">
+          <div className="hidden items-center gap-3 lg:flex">
             <AuthControls />
           </div>
         </div>
