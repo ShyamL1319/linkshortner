@@ -96,7 +96,7 @@ jobs:
   preview:
     name: 3. Preview Release
     needs: validate
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/development')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -149,7 +149,7 @@ jobs:
   deploy:
     name: 5. Production Release
     needs: approve
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/development')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
