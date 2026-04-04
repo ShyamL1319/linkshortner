@@ -84,7 +84,8 @@ export function ChatWidget({ apiEndpoint, title, description, icon }: ChatWidget
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: next.map(({ role, content }) => ({ role, content })),
+            messages: next.map(({ role, content }) => ({ role, content })),
+            provider: "gemini",
         }),
       });
 

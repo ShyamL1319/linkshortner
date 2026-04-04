@@ -82,7 +82,7 @@ export function OpenApiChatWidget() {
     setError("");
 
     try {
-      const response = await fetch("/api/open-api/chat", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -7,6 +7,7 @@ export const chatMessageSchema = z.object({
 
 export const chatRequestSchema = z.object({
   messages: z.array(chatMessageSchema).min(1),
+  provider: z.enum(["gemini", "openai"]).optional(),
 });
 
 export const createLinkArgsSchema = z.object({

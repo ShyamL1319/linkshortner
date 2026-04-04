@@ -38,7 +38,7 @@ export default function RootLayout({
             <SiteFooter />
             {/* <OpenApiChatWidget /> */}
             <ChatWidget
-              apiEndpoint="/api/gemini/chat"
+              apiEndpoint="/api/chat"
               title="Gemini Assistant"
               description="Powered by Google Gemini."
               icon={<Bot className="h-4 w-4" />}
