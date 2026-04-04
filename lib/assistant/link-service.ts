@@ -1,6 +1,6 @@
 import { createLink } from "@/data/links";
 import { createLinkArgsSchema } from "./types";
-import type { AssistantFunctionCall, CreatedLinkSummary } from "./types";
+import type { AssistantFunctionCall } from "./types";
 
 function buildShortUrl(origin: string, shortCode: string): string {
   return new URL(`/l/${encodeURIComponent(shortCode)}`, origin).toString();

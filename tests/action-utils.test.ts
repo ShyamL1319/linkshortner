@@ -1,45 +1,42 @@
-import assert from "node:assert/strict";
-import test from "node:test";
 import { z } from "zod";
 import {
   normalizeCustomSlug,
   parseActionError,
 } from "../app/dashboard/action-utils";
 
-test("normalizeCustomSlug converts empty strings to undefined", () => {
-  assert.equal(normalizeCustomSlug(""), undefined);
-  assert.equal(normalizeCustomSlug("my-link"), "my-link");
-});
-
-test("parseActionError prefers zod validation messages", () => {
-  const schema = z.object({
-    url: z.string().url("Please enter a valid URL"),
+describe("action-utils", () => {
+  it("normalizeCustomSlug converts empty strings to undefined", () => {
+    expect(normalizeCustomSlug("")).toBeUndefined();
+    expect(normalizeCustomSlug("my-link")).toBe("my-link");
   });
 
-  const result = schema.safeParse({ url: "not-a-url" });
-  assert.equal(result.success, false);
+  it("parseActionError prefers zod validation messages", () => {
+    const schema = z.object({
+      url: z.string().url("Please enter a valid URL"),
+    });
 
-  if (!result.success) {
-    assert.equal(
-      parseActionError(result.error, "Failed to create link"),
-      "Please enter a valid URL",
-    );
-  }
-});
+    const result = schema.safeParse({ url: "not-a-url" });
+    expect(result.success).toBe(false);
 
-test("parseActionError maps unique constraint errors to a friendly message", () => {
-  assert.equal(
-    parseActionError(
-      new Error("duplicate key value violates unique constraint"),
-      "Failed to create link",
-    ),
-    "This custom slug is already taken",
-  );
-});
+    if (!result.success) {
+      expect(
+        parseActionError(result.error, "Failed to create link")
+      ).toBe("Please enter a valid URL");
+    }
+  });
 
-test("parseActionError falls back for unknown errors", () => {
-  assert.equal(
-    parseActionError(new Error("boom"), "Failed to create link"),
-    "Failed to create link",
-  );
+  it("parseActionError maps unique constraint errors to a friendly message", () => {
+    expect(
+      parseActionError(
+        new Error("duplicate key value violates unique constraint"),
+        "Failed to create link"
+      )
+    ).toBe("This custom slug is already taken");
+  });
+
+  it("parseActionError falls back for unknown errors", () => {
+    expect(
+      parseActionError(new Error("boom"), "Failed to create link")
+    ).toBe("Failed to create link");
+  });
 });
