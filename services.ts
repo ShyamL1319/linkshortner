@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { createLinkInDb } from "./repositories";
 
 /**
@@ -10,15 +11,30 @@ import { createLinkInDb } from "./repositories";
  * In a real app, you might use 'nanoid' or a custom base62 encoder.
  */
 function generateShortCode(): string {
-  return Math.random().toString(36).substring(2, 8);
+  return crypto.randomBytes(8).toString("base64url").slice(0, 8);
 }
 
 export async function createShortLinkService(originalUrl: string, userId: string) {
-  const shortCode = generateShortCode();
-  
-  return createLinkInDb({
-    originalUrl,
-    shortCode,
-    userId,
-  });
+  let attempts = 0;
+  const maxAttempts = 5;
+
+  while (attempts < maxAttempts) {
+    try {
+      const shortCode = generateShortCode();
+      return await createLinkInDb({
+        originalUrl,
+        shortCode,
+        userId,
+      });
+    } catch (error: any) {
+      if (error.code === '23505') {
+        attempts++;
+        if (attempts === maxAttempts) {
+          throw error;
+        }
+      } else {
+        throw error;
+      }
+    }
+  }
 }

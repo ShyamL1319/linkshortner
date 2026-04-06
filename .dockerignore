@@ -7,6 +7,8 @@ README.md
 .git
 .github
 .vercel
+.env
+.env.*
 .env*.local
 coverage
 build

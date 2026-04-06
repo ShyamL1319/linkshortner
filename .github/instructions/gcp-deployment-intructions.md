@@ -84,4 +84,4 @@ WIF allows GitHub Actions to securely authenticate to GCP without exporting long
 ### Step 6: Dockerize the Application
 Cloud Run deploys containerized applications.
 1. Ensure a `Dockerfile` exists in the root of your repository.
-2. If using Next.js, ensure `output: 'standalone'` is set in your `next.config.js` to drastically reduce the container image size.
+2. If using Next.js, ensure `output: 'standalone'` is set in your `next.config.mjs` to drastically reduce the container image size.
