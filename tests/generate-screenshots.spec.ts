@@ -28,7 +28,7 @@ test('generate application workflow screenshots', async ({ page }) => {
 
   // 2. Capture Authentication (Sign In / Sign Up)
   if (!hasAuthFile) {
-    await page.getByRole('button', { name: 'Sign In' }).filter({ state: 'visible' }).first().click();
+    await page.getByRole('button', { name: 'Sign In' }).first().click();
     await page.waitForTimeout(2500); // Give the Clerk widget time to fully mount and animate
     await page.screenshot({ path: 'public/readme/sign-in.png' });
   }
@@ -44,7 +44,7 @@ test('generate application workflow screenshots', async ({ page }) => {
     // Open the Sign In modal if the email input is not already visible.
     const emailInput = page.locator('input[name="identifier"], input[type="email"]').first();
     if (!(await emailInput.isVisible())) {
-      await page.getByRole('button', { name: 'Sign In' }).filter({ state: 'visible' }).first().click();
+      await page.getByRole('button', { name: 'Sign In' }).first().click();
     }
 
     // Fill email
