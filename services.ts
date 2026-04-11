@@ -26,8 +26,10 @@ export async function createShortLinkService(originalUrl: string, userId: string
         shortCode,
         userId,
       });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      if (error.code === '23505') {
+
+      if (error.code === "23505") {
         attempts++;
         if (attempts === maxAttempts) {
           throw error;
