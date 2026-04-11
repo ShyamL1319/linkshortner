@@ -9,7 +9,7 @@ import { revalidatePath } from "next/cache";
  * Delegates the actual execution to the Service layer.
  */
 export async function createShortLinkAction(formData: FormData) {
-  const { userId } = auth();
+  const { userId } = await auth();
   
   if (!userId) {
     throw new Error("Unauthorized: You must be logged in to create a link.");
